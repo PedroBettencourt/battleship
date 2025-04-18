@@ -1,8 +1,9 @@
 class Ship {
-    constructor(length, hits = 0, sunk = false) {
-        this.length = length;
-        this.hits = hits;
-        this.sunk = sunk;
+    constructor(name) {
+        this.name = name;
+        this.length = this.lengthName();
+        this.hits = 0;
+        this.sunk = false;
     }
 
     hit() {
@@ -12,6 +13,16 @@ class Ship {
     isSunk() {
         if (this.length === this.hits) this.sunk = true;
     }
+
+    lengthName() {
+        let length;
+        if (this.name === "C") length = 5;
+        if (this.name === "B") length = 4;
+        if (this.name === "D") length = 3;
+        if (this.name === "S") length = 3;
+        if (this.name === "P") length = 2;
+        return length;
+    }
 }
 
 class Gameboard {
@@ -20,28 +31,28 @@ class Gameboard {
         this.ships = [];
     }
 
-    placeShip(x, y, length, direction) {
+    placeShip(name, x, y, length, direction) {
         // Checks if board can place the ship
         for (let i = 0; i < length; i++) {
             if (direction === "horizontal") {
                 if (this.board[x][y + i] !== 0) {
-                    throw new Error("Position already occupied!");
+                    throw new Error("Horizontal position already occupied!");
                 }
             } else {
                 if (this.board[x + i][y] !== 0) {
-                    throw new Error("Position already occupied!");
+                    throw new Error("Vertical position already occupied!");
                 }
             }
         }
 
         // Create ship
-        const ship = new Ship(length);
+        const ship = new Ship(name);
         this.ships.push(ship);
         
         // Place ship on game board
-        for (let i = 0; i < ship.length; i++) {
-            if (direction === "horizontal") this.board[x][y + i] = ship.length;
-            else this.board[x + i][y] = ship.length;
+        for (let i = 0; i < length; i++) {
+            if (direction === "horizontal") this.board[x][y + i] = ship.name;
+            else this.board[x + i][y] = ship.name;
         }
     }
 
@@ -60,27 +71,32 @@ class Gameboard {
         
         // Attack hits a ship
         this.board[x][y] = "X";
-        const ship = this.ships.find(e => e.length === position);
+        const ship = this.ships.find(e => e.name === position);
         ship.hit();
-        
-        if (this.getAllSunk()) return true;
-        return false;
+        ship.isSunk();
+        if (ship.sunk) {
+            return true;
+        }
     }
 
     getAllSunk() {
-        this.ships.forEach(ship => ship.isSunk());
         const notSunk = this.ships.some(ship => ship.sunk === false);
         if (!notSunk) {
-            console.log("Game is over!");
             return true;
         }
     }
 }
 
 class Player {
-    constructor(type) {
+    constructor(type, turn = false) {
         this.type = type;
         this.gameboard = new Gameboard();
+        this.turn = turn;
+    }
+
+    turnSwitch() {
+        if (this.turn === false) this.turn = true;
+        else this.turn = false;
     }
 }
 

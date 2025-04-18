@@ -1,8 +1,17 @@
 html, body {
     height: 100%;
+    font-family: sans-serif;
 }
 
-body {
+.sunk {
+    height: 25px;
+    margin-top: 50px;
+    text-align: center;
+    font-size: 2em;
+}
+
+.boards {
+    margin-top: 50px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -14,14 +23,15 @@ body {
     width: fit-content;
     padding: 10px;
     display: grid;
-    grid-template-columns: repeat(10, 50px);
-    grid-template-rows: repeat(10, 50px);
+    grid-template-columns: repeat(10, 45px);
+    grid-template-rows: repeat(10, 45px);
 }
 
 .square {
+    font-size: 1.3em;
     border: 1px solid black;
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
     display: flex;
     justify-content: center;
     align-items: center;
