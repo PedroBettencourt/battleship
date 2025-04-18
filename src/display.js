@@ -19,9 +19,16 @@ export default (() => {
     const deleteCreateShips = (() => {
         const boardDiv = document.querySelector(".board");
         boardDiv.remove();
+
+        // Remove text on top
+        const message = document.querySelector(".sunk");
+        message.textContent = "";
     })
 
     const displayCreateShip = ((name, length, x, y, direction) => {
+        // Text on top
+        const message = document.querySelector(".sunk");
+        message.textContent = `Place ${name} ship`;
 
         const squaresDiv = document.querySelectorAll(".square");
         squaresDiv.forEach(square => {
@@ -36,8 +43,8 @@ export default (() => {
                     else throw new Error("Impossible to place ship there!");
                 }
             } else {
-                for (let i = 0; i++; i < length) {
-                    const squareDiv = document.querySelector(`.square[data-id="${x + i}${y}]"`);
+                for (let i = 0; i < length; i++) {
+                    const squareDiv = document.querySelector(`.square[data-id="${x + i}${y}"]`);
                     if (squareDiv.textContent === "") squareDiv.textContent = name;
                     else throw new Error("Impossible to place ship there!");
                 }

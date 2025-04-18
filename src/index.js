@@ -2,82 +2,73 @@ import "./style.css";
 import { Player } from "./classes";
 import display from "./display";
 
-const createBoardPlayer = (async(player) => {
-    display.createShips();
-    let shipNames = [... Object.keys(ships)];
-    while(shipNames.length !== 0) {
-        const ship = shipNames[0];
-        let resultShipPlacement;
-        try {
-            resultShipPlacement = await createShipPlayer(ship, ships[ship]);
-        } catch(error) {
-            console.log(error)
-        }
 
-        if (!resultShipPlacement) continue;
-        if (placeShipPlayer(resultShipPlacement, player, ship, ships[ship])) {
-            shipNames.shift();
-            display.displayBoard(player.gameboard.board, player.type);
-            
-            if (shipNames.length === 0) display.deleteCreateShips();
+const placeShipPlayer = (async(player, name, length) => {
+    // Direction
+    let direction = "horizontal";
+    window.addEventListener("keydown", (e) => {
+        if (e.key !== "q" && e.key !== "e") return;
+        if (direction === "horizontal") direction = "vertical";
+        else direction = "horizontal";
+    })
+    
+    // Get coords
+    function transformTargetCoords(e) {
+        let [x, y] = e.target.dataset.id;
+        x = parseInt(x);
+        y = parseInt(y);
+        return [x, y]
+    }
+
+    function handleMouse(e) {
+        if (e.target.className !== "square") return;
+        const [x, y] = transformTargetCoords(e);
+        try {
+            display.displayCreateShip(name, length, x, y, direction);
+        } catch (error) {
+            //console.log(error)
         }
     }
-});
-
-const createShipPlayer = ((name, length) => {
-    // Show where the ship will be placed
-    
-
-    // Click board to place ship
     const boardDiv = document.querySelector(".board");
 
-    //boardDiv.addEventListener("mouseover", (e) )
+    boardDiv.addEventListener("mouseover", handleMouse);
 
-    return new Promise(function (resolve, reject) {
-        boardDiv.addEventListener("click", (e) => {
-            // Remove hover event listener
-            squaresDiv.forEach(
-                square => square.removeEventListener("mouseover", createShipHover)
-            );
-            
-            if (e.target.className != "square") reject(new Error("Outside the board"));
-            resolve(e.target);
-        })
-    });
-});
-
-//  const createShipHover = ((square, name, length) => {
-//     console.log(square)
-//     const id = square.dataset.id;
-//     let [x, y] = id.split("");
-//     x = parseInt(x);
-//     y = parseInt(y);
-//     try {
-//         display.displayCreateShip(name, length, x, y, "horizontal");
-//     } catch (error) {
-//         //console.error(error)
-//     }
-// });
-
-const placeShipPlayer = ((position, player, name, length) => {
-    let [x, y] = position.dataset.id.split("");
-    x = parseInt(x);
-    y = parseInt(y);
-
-    let direction = Math.floor(Math.random() * 2);
-    if (direction === 0) direction = "horizontal";
-    else direction = "vertical";
+    function createClickEvent() {
+        return new Promise(function(resolve) {
+            boardDiv.addEventListener("click", (e) => {
+                if (e.target.className !== "square") return;
+                boardDiv.removeEventListener("mouseover", handleMouse);
+                resolve(e);
+            })
+        });
+    }
+    
+    const placeShip = await createClickEvent();
+    const [x, y] = transformTargetCoords(placeShip)
 
     try {
         player.gameboard.placeShip(name, x, y, length, direction);
         return true;
     } catch(error) {
-        console.log(error)
+        //console.log(error)
         return false;
     }
 })
 
-const placeShipRandom = ((gameboard, name, length) => {
+const placeAllShipsPlayer = (async(player, ships) => {
+    display.createShips();
+    let shipNames = [... Object.keys(ships)];
+    while (shipNames.length !== 0) {
+        console.log("hm")
+        let ship = shipNames[0];
+        const shipPlaced = await placeShipPlayer(player, ship, ships[ship]);
+        if (shipPlaced) shipNames.shift();
+    }
+    display.deleteCreateShips();
+})
+
+
+const placeAllShipsComputer = ((gameboard, name, length) => {
     let x = Math.floor(Math.random() * 10);
     let y = Math.floor(Math.random() * 10);
     let direction = Math.floor(Math.random() * 2);
@@ -88,7 +79,7 @@ const placeShipRandom = ((gameboard, name, length) => {
         gameboard.placeShip(name, x, y, length, direction);
         return;
     } catch {
-        placeShipRandom(gameboard, name, length);
+        placeAllShipsComputer(gameboard, name, length);
     }
 });
 
@@ -159,12 +150,12 @@ const checkAllSunk = ((gameboard, attackGiver) => {
 const startGame = (async(players) => {
     for (const player of players) {
         if (player.type === "player") {
-            await createBoardPlayer(player);
+            await placeAllShipsPlayer(player, ships);
             display.createBoard(player.gameboard.board, player.type);
     
         } else {
             for (const [name, length] of Object.entries(ships)) {
-                placeShipRandom(player.gameboard, name, length);
+                placeAllShipsComputer(player.gameboard, name, length);
             }
             display.createBoard(player.gameboard.board, player.type);
         }
