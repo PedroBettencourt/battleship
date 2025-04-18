@@ -21,6 +21,32 @@ export default (() => {
         boardDiv.remove();
     })
 
+    const displayCreateShip = ((name, length, x, y, direction) => {
+
+        const squaresDiv = document.querySelectorAll(".square");
+        squaresDiv.forEach(square => {
+            if (square.textContent === name ) square.textContent = "";
+        })
+
+        try {
+            if (direction === "horizontal") {
+                for (let i = 0; i < length; i++) {
+                    const squareDiv = document.querySelector(`.square[data-id="${x}${y + i}"]`);
+                    if (squareDiv.textContent === "") squareDiv.textContent = name;
+                    else throw new Error("Impossible to place ship there!");
+                }
+            } else {
+                for (let i = 0; i++; i < length) {
+                    const squareDiv = document.querySelector(`.square[data-id="${x + i}${y}]"`);
+                    if (squareDiv.textContent === "") squareDiv.textContent = name;
+                    else throw new Error("Impossible to place ship there!");
+                }
+            }
+        } catch (error) {
+            throw new Error("Impossible to place ship there");
+        }
+    })
+
     const createBoard = ((board, playerType) => {
         const boardDiv = document.createElement("div");
         boardDiv.className = "board ";
@@ -33,7 +59,7 @@ export default (() => {
                 square.dataset.id = `${i}${j}`;
                 square.textContent = displayElement(element, playerType);
                 boardDiv.appendChild(square);
-            })
+            });
         });
         const boards = document.querySelector(".boards");
         boards.appendChild(boardDiv);
@@ -76,5 +102,5 @@ export default (() => {
         sunkDiv.textContent = `${player} has won!`;
     })
 
-    return {createShips, deleteCreateShips, createBoard, displayBoard, displaySunk, removeDisplaySunk, displayGameOver}
+    return {createShips, deleteCreateShips, displayCreateShip, createBoard, displayBoard, displaySunk, removeDisplaySunk, displayGameOver}
 })()
