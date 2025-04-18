@@ -48,6 +48,7 @@ const placeShipPlayer = (async(player, name, length) => {
 
     try {
         player.gameboard.placeShip(name, x, y, length, direction);
+        display.displayBoard(player.gameboard.board, player.type);
         return true;
     } catch(error) {
         //console.log(error)
@@ -59,8 +60,8 @@ const placeAllShipsPlayer = (async(player, ships) => {
     display.createShips();
     let shipNames = [... Object.keys(ships)];
     while (shipNames.length !== 0) {
-        console.log("hm")
         let ship = shipNames[0];
+        display.createMessage(ship)
         const shipPlaced = await placeShipPlayer(player, ship, ships[ship]);
         if (shipPlaced) shipNames.shift();
     }

@@ -1,5 +1,12 @@
 export default (() => {
 
+    const createMessage = ((name) => {
+        // Text on top
+        const message = document.querySelector(".sunk");
+        message.textContent = `Place ${name} ship`;
+
+    })
+
     const createShips = (() => {
         const boardDiv = document.createElement("div");
         boardDiv.className = "board";
@@ -26,10 +33,6 @@ export default (() => {
     })
 
     const displayCreateShip = ((name, length, x, y, direction) => {
-        // Text on top
-        const message = document.querySelector(".sunk");
-        message.textContent = `Place ${name} ship`;
-
         const squaresDiv = document.querySelectorAll(".square");
         squaresDiv.forEach(square => {
             if (square.textContent === name ) square.textContent = "";
@@ -109,5 +112,5 @@ export default (() => {
         sunkDiv.textContent = `${player} has won!`;
     })
 
-    return {createShips, deleteCreateShips, displayCreateShip, createBoard, displayBoard, displaySunk, removeDisplaySunk, displayGameOver}
+    return {createMessage, createShips, deleteCreateShips, displayCreateShip, createBoard, displayBoard, displaySunk, removeDisplaySunk, displayGameOver}
 })()
