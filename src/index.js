@@ -110,7 +110,7 @@ const playRound = ((e, player1, player2) => {
     //player2.turnSwitch();
 
     // Computer's turn
-    [x, y] = attackComputer(player1.gameboard.board);
+    [x, y] = attackComputer(player1.gameboard);
     if (attack(x, y, player1.gameboard, player1, player2)) return true;
 
     //player1.turnSwitch();
@@ -127,11 +127,48 @@ const attack = ((x, y, gameboard, attackReceiver, attackGiver) => {
 });
 
 const attackComputer = ((gameboard) => {
-    let x = Math.floor(Math.random(0, 1) * 10);
-    let y = Math.floor(Math.random(0, 1) * 10);
+    const board = gameboard.board;
+    let x;
+    let y;
+
+    // Look for hit ships that aren't sunk
+    for (let i = 0; i < 10; i++) {
+        for (let j = 0; j < 10; j++) {
+
+            let position = board[i][j];
+            if (position[1] !== "X") continue;
+
+            const ship = gameboard.ships.filter(ship => ship.name === position[0])[0];
+            if (ship.sunk) continue;
+
+            // Position to the left
+            if (board[i][j - 1] !== "." && board[i][j - 1][1] !== "X") {
+                [x, y] = [i, j - 1];
+            };
+
+            // Position to the right
+            if (board[i][j + 1] !== "." && board[i][j + 1][1] !== "X") {
+                [x, y] = [i, j + 1]
+            };
+
+            // Position on top
+            if (board[i - 1][j] !== "." && board[i - 1][j][1] !== "X") {
+                [x, y] = [i - 1, j]
+            };
+
+            // Position on the bottom
+            if (board[i + 1][j] !== "." && board[i + 1][j][1] !== "X") {
+                [x, y] = [i + 1, j]
+            };
+        }
+    }
+    if (!x && !y) {
+        x = Math.floor(Math.random(0, 1) * 10);
+        y = Math.floor(Math.random(0, 1) * 10);
+    }
     
-    const position = gameboard[x][y];
-    if (position === "X" || position === ".") {
+    const position = board[x][y];
+    if (position[1] === "X" || position === ".") {
         [x, y] = attackComputer(gameboard);
     }
     return [x, y];
@@ -141,7 +178,6 @@ const checkAllSunk = ((gameboard, attackGiver) => {
     const gameOver = gameboard.getAllSunk();
     if (gameOver) {
         display.displayGameOver(attackGiver.type);
-        const playBoard = document.querySelector(".computer");
         return true
     }
 });

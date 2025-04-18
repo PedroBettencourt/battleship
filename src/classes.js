@@ -59,7 +59,7 @@ class Gameboard {
     receiveAttack(x, y) {
         const position = this.board[x][y];
         // Already played
-        if (position === "X" || position === ".") {
+        if (position[1] === "X" || position === ".") {
             throw new Error("Position already tried!");
         }
         
@@ -70,7 +70,7 @@ class Gameboard {
         }
         
         // Attack hits a ship
-        this.board[x][y] = "X";
+        this.board[x][y] += "X";
         const ship = this.ships.find(e => e.name === position);
         ship.hit();
         ship.isSunk();

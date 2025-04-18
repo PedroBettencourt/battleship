@@ -87,11 +87,14 @@ export default (() => {
     const displayElement = ((element, playerType) => {
         if (playerType === "player") {
             if (element === 0) return "";
+            if (element[1] === "X") return element[1]
             return element;
         };
 
-        if (element === "." || element === "X") return element;
+        if (element === ".") return element;
+        if (element[1] === "X") return element[1]
         return "";
+
     })
 
     const displaySunk = ((player1, player2) => {
